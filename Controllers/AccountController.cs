@@ -10,6 +10,11 @@ namespace GridStatePOC.Controllers
     {
         private readonly ILogger<AccountController> _logger;
 
+        public AccountController(ILogger<AccountController> logger)
+        {
+            _logger = logger;
+        }
+
         [HttpGet]
         public IActionResult Login() => View();
 
@@ -32,7 +37,7 @@ namespace GridStatePOC.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login");
+            return RedirectToAction("Index", "Home");
         }
     }
 }

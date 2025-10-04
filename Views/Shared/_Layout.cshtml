@@ -5,18 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - GridStatePOC</title>
     <script type="importmap"></script>
+    @* <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@34.2.0/styles/ag-grid.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ag-grid-community@34.2.0/styles/ag-theme-alpine.css" /> *@
+
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="~/css/devextreme/dx.light.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/GridStatePOC.styles.css" asp-append-version="true" />
-    <!-- head -->
-    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/latest/css/dx.light.css" />
 
-    <!-- before </body> -->
-    <script src="https://cdn3.devexpress.com/jslib/latest/js/dx.all.js"></script>
-
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/devextreme/dx.all.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.mvc.js"></script>
+    <script src="~/js/devextreme/aspnet/dx.aspnet.data.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
 </head>
 <body>
     <header>
+        @using Microsoft.AspNetCore.Identity
+        @using System.Security.Claims
+
+        @{
+            var isLoggedIn = User.Identity?.IsAuthenticated ?? false;
+            var username = User.Identity?.Name ?? "";
+        }
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">GridStatePOC</a>
@@ -29,12 +41,35 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        @if (isLoggedIn)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="CityGrid">Data Grid</a>
+                            </li>
+                        }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
                 </div>
+                <div class="ms-auto d-flex align-items-center gap-2">
+                    @if (!isLoggedIn)
+                    {
+                        <form method="post" asp-controller="Account" asp-action="Login" class="d-flex gap-1">
+                            <input type="text" name="username" placeholder="Username" class="form-control form-control-sm" />
+                            <button type="submit" class="btn btn-primary btn-sm">Login</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span class="text-white" style="color:#903ca5 !important" ;>Hello, <strong>@username</strong></span>
+                        <form method="get" asp-controller="Account" asp-action="Logout">
+                            <button type="submit" class="btn btn-danger btn-sm">Logout</button>
+                        </form>
+                    }
+                </div>
             </div>
+
         </nav>
     </header>
     <div class="container">
@@ -48,9 +83,7 @@
             &copy; 2025 - GridStatePOC - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

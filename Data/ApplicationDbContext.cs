@@ -10,5 +10,15 @@ namespace GridStatePOC.Data
 
         public DbSet<City> Cities { get; set; }
         public DbSet<GridState> GridStates { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<GridState>()
+                .HasIndex(x => new { x.UserName, x.PageKey })
+                .IsUnique();
+        }
+
     }
 }

@@ -1,0 +1,66 @@
+﻿@using DevExtreme.AspNet.Mvc
+@using DevExtreme.AspNet.Mvc.Builders
+@using GridStatePOC.Models
+@model IEnumerable<City>
+
+@{
+    ViewData["Title"] = "City Grid";
+}
+
+<h2>City Grid</h2>
+
+@(Html.DevExtreme().DataGrid<City>()
+    .ID("gridContainer")
+    .DataSource(Model) // pass server-side model
+    .KeyExpr("Id")
+    .ShowBorders(true)
+    .ColumnAutoWidth(true)
+    .ShowRowLines(true)
+    .HeaderFilter(headerFilter => headerFilter.Visible(true))
+    .FilterRow(f => f.Visible(true))
+    .FilterPanel(fp => fp.Visible(true))
+    .StateStoring(s => {
+        s.Enabled(true);
+        s.Type(StateStoringType.Custom);
+
+        s.CustomLoad(@<text>
+            function() {
+                const pageKey = 'CityGrid';
+                return fetch('/api/UserGridState/get?pageKey=' + pageKey, { cache: 'no-store' })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.stateJson) {
+                            try {
+                                return JSON.parse(data.stateJson);
+                            } catch (e) {
+                                console.error('Failed to parse stateJson', e);
+                                return {};
+                            }
+                        }
+                        return {};
+                });
+            }
+        </text>);
+
+        s.CustomSave(@<text>
+            function(state) {
+                const pageKey = 'CityGrid';
+                if (!state || Object.keys(state).length === 0) return;
+                return fetch('/api/UserGridState/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        pageKey: pageKey, stateJson: JSON.stringify(state)
+                    })
+                });
+            }
+        </text>);
+    })
+    .Columns(columns => {
+        columns.AddFor(c => c.Name)
+               .HeaderFilter(hf => hf.Search(s => s.Enabled(true))); // multi-select + search
+        columns.AddFor(c => c.State);
+        columns.AddFor(c => c.Country);
+        columns.AddFor(c => c.Population);
+    })
+)

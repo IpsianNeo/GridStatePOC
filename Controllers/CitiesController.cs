@@ -1,5 +1,6 @@
 ﻿using GridStatePOC.Data;
 
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,6 +8,7 @@ namespace GridStatePOC.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class CitiesController : ControllerBase
     {
         private readonly ILogger<CitiesController> _logger;
